@@ -74,11 +74,21 @@ export default class MoviesPage extends Component {
             limit: currLimit,
         });
     };
+
     changeCurrentPage = (pageNumber) => {
         this.setState({
             currentPage: pageNumber,
         });
     };
+    // Basically jab bhi group by genre chlega toh search box me jo content hoga wo empty ho jaega.
+    // Group by me searching ka option nhi hai.
+    groupBygenre = (name) => {
+        this.setState({
+            cGenres: name,
+            currSearchText: "",
+        });
+    };
+
     async componentDidMount() {
         // console.log(2);
         let resp = await fetch("https://react-backend101.herokuapp.com/movies");
@@ -94,19 +104,44 @@ export default class MoviesPage extends Component {
     }
     render() {
         // console.log(this.state.movies);
-        let { movies, currSearchText, limit, currentPage, genres } = this.state;
+        let { movies, currSearchText, limit, currentPage, genres, cGenres } =
+            this.state;
+        let filteredArr = movies;
+        // ye Basically sort karega Genres ke basis pe.
+        if (cGenres != "All Genres") {
+            // Jo genre pe click hua hai wo agar cGenre ke barabar hoga toh filter true return karega, or filteredArr me wo elements sb aa jaengey.
+            filteredArr = filteredArr.filter((movieObj) => {
+                return movieObj.genre.name == cGenres;
+            });
+        }
         // yaha pe filter isliye kiye kyuki jb bhi set state call hoga
         // setcurrentText se toh filter karenge display using movies objects pe phir filtered movies show hoga
-        let filteredArr = movies.filter((movieObj) => {
-            // movies pe filter kr rhe hai
-            let title = movieObj.title.trim().toLowerCase(); // movie object se title nikal ke lowercase me convert krenge or trim kr denge
+        // filteredArr = movies.filter((movieObj) => {
+        //     // movies pe filter kr rhe hai
+        //     let title = movieObj.title.trim().toLowerCase(); // movie object se title nikal ke lowercase me convert krenge or trim kr denge
 
-            return title.includes(currSearchText.trim().toLowerCase()); // If the input in search box match from the title in movies given then it returns true.
-        });
-        if (currSearchText === "") {
-            // agar empty ho search box me toh pura movies ko show krna hoga.
-            filteredArr = movies;
+        //     return title.includes(currSearchText.trim().toLowerCase()); // If the input in search box match from the title in movies given then it returns true.
+        // });
+
+        // if (currSearchText === "") {
+        //     // agar empty ho search box me toh pura movies ko show krna hoga.
+        //     filteredArr = movies;
+        // }
+
+        if (currSearchText != "") {
+            filteredArr = filteredArr.filter((movieObj) => {
+                // movies pe filter kr rhe hai
+                let title = movieObj.title.trim().toLowerCase(); // movie object se title nikal ke lowercase me convert krenge or trim kr denge
+
+                return title.includes(currSearchText.trim().toLowerCase()); // If the input in search box match from the title in movies given then it returns true.
+            });
         }
+
+        // si->(pagenumber-1)*limit
+        // eidx-=si+limit;
+        // number of pages
+        // sort
+
         // pagination ke liye numberOfPage nikalye, pageNumberArr and filteredArr.
         let numberofPage = Math.ceil(filteredArr.length / limit); // total number of pages -> math.ceil always give greater elemnet than actual number
         let pageNumberArr = []; // pagenumberarr mein number of page stored ho jaega array ke form me.
@@ -122,10 +157,18 @@ export default class MoviesPage extends Component {
             <div className="row">
                 {/* 12 part */}
                 <div className="col-3">
+                    {/* Yaha basically left side me genres ka name nikal ke usko sort krenge kb jb bhi uss genre pe click ho. */}
                     <ul class="list-group">
+                        {/* It shows all genres to left column of page. */}
                         {genres.map((cgObj) => {
                             return (
-                                <li class="list-group-item" key={cgObj.id}>
+                                <li
+                                    class="list-group-item "
+                                    key={cgObj.id}
+                                    onClick={() => {
+                                        this.groupBygenre(cgObj.name);
+                                    }}
+                                >
                                     {cgObj.name}
                                 </li>
                             );
@@ -212,11 +255,19 @@ export default class MoviesPage extends Component {
                     {/* pagination code taken from bootstrap */}
                     <nav aria-label="..." className="col-2">
                         <ul className="pagination ">
-                            {pageNumberArr.map((pageNumber) => {  // upar se pageNumberArr me element lake map kr rha hai.
+                            {pageNumberArr.map((pageNumber) => {
+                                // upar se pageNumberArr me element lake map kr rha hai.
+                                let additional =
+                                    pageNumber == currentPage
+                                        ? "page-item active"
+                                        : "page-item"; // it checks which page is clicked and should be active on click.
                                 return (
                                     <li
-                                        className="page-item active"
+                                        className={additional}
                                         aria-current="page"
+                                        onClick={() => {
+                                            this.changeCurrentPage(pageNumber);
+                                        }}
                                     >
                                         <span className="page-link">
                                             {pageNumber}
