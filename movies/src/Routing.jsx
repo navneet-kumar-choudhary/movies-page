@@ -4,13 +4,26 @@
 // npm i react-router-dom to instal router in react.
 
 import React, { Component } from "react";
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, Redirect, Link } from "react-router-dom";
 
 export default class Routing extends Component {
     render() {
         return (
             <div>
                 Routing Example
+                {/* Link component kabhi bhi page ko relode nhi one jaise ki anchor tag kr dete hai. */}
+                {/* UI for render not to relode the page */}
+                <ul>
+                    <li>
+                        <Link to="/home/profile">Profile</Link>
+                    </li>
+                    <li>
+                        <Link to="/listing">Listing</Link>
+                    </li>
+                    <li>
+                        <Link to="/home">Home</Link>
+                    </li>
+                </ul>
                 {/* Switch ek component hai -> Switch tb use karenge jb N number of Route hai or unmese ek hi implement krna hai toh switch use karenge */}
                 {/* jb multiple route ho lihte hai page pe tb jo exact jo route ho wo chale uske liye EXACT use hota hai */}
                 {/* <Route path="/home/profile" exact component={Profile}></Route> */}
@@ -24,13 +37,15 @@ export default class Routing extends Component {
                 {/* not a match -> error */}
                 {/* route -> pathi is a subset route will match */}
                 {/* Switch -> every route that i have i will render only one of them */}
+                
+                {/* logic to route the page address */}
                 <Switch>
                     <Route path="/home/profile" component={Profile}></Route>
                     <Route path="/listing" exact component={Listing}></Route>
                     <Route path="/home" exact component={Home}></Route>
                     <Redirect from="/home" to="/"></Redirect>
                     <Route path="/" exact component={Home}></Route>
-                    <Route>component={Error}</Route>
+                    <Route component={Error}></Route>
                 </Switch>
             </div>
         );

@@ -1,24 +1,17 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 // import { getMovies } from "./temp/MovieService";
 import List from "./List.jsx";
 import Pagination from "./Pagination.jsx";
 export default class MoviesPage_II extends Component {
     state = {
-        movies: [],
         genres: [{ id: 1, name: "All Genres" }],
         currSearchText: "",
         limit: 4,
         currentPage: 1,
         cGenre: "All Genres",
     };
-    deleteEntry = (id) => {
-        let filtereMovies = this.state.movies.filter((movieObj) => {
-            return movieObj._id != id;
-        });
-        this.setState({
-            movies: filtereMovies,
-        });
-    };
+
     setCurrentText = (e) => {
         let task = e.target.value;
         // filter
@@ -29,7 +22,7 @@ export default class MoviesPage_II extends Component {
     sortByRatings = (e) => {
         let className = e.target.className;
         let sortedMovies;
-        let { movies } = this.state;
+        let { movies } = this.props;
         if (className == "fas fa-sort-up") {
             sortedMovies = movies.sort((movieObjA, movieObjB) => {
                 return movieObjA.dailyRentalRate - movieObjB.dailyRentalRate;
@@ -46,7 +39,7 @@ export default class MoviesPage_II extends Component {
     sortByStock = (e) => {
         let className = e.target.className.trim();
         let sortedMovies;
-        let { movies } = this.state;
+        let { movies } = this.props;
         if (className == "fas fa-sort-up") {
             sortedMovies = movies.sort((movieObjA, movieObjB) => {
                 return movieObjA.numberInStock - movieObjB.numberInStock;
@@ -82,12 +75,8 @@ export default class MoviesPage_II extends Component {
     };
     async componentDidMount() {
         // console.log(2);
-        let resp = await fetch("https://react-backend101.herokuapp.com/movies");
-        let jsonMovies = await resp.json();
-        this.setState({
-            movies: jsonMovies.movies,
-        });
-        resp = await fetch("https://react-backend101.herokuapp.com/genres");
+
+        let resp = await fetch("https://react-backend101.herokuapp.com/genres");
         let jsonGenres = await resp.json();
         this.setState({
             genres: [...this.state.genres, ...jsonGenres.genres],
@@ -95,8 +84,8 @@ export default class MoviesPage_II extends Component {
     }
 
     render() {
-        let { movies, currSearchText, limit, currentPage, genres, cGenre } =
-            this.state;
+        let { currSearchText, limit, currentPage, genres, cGenre } = this.state;
+        let { movies, deleteEntry } = this.props;
         // console.log(movies);
         //   genre
         let filteredArr = movies;
@@ -137,6 +126,12 @@ export default class MoviesPage_II extends Component {
                     ></List>
                 </div>
                 <div className="col-9">
+                    <button className="btn btn-primary">
+                        {/* to interact with ui you have to add Link */}
+                        <Link to="/new" className="text-light">
+                            New
+                        </Link>
+                    </button>
                     <input
                         type="search"
                         value={currSearchText}
@@ -195,9 +190,7 @@ export default class MoviesPage_II extends Component {
                                                 type="button"
                                                 className="btn btn-danger"
                                                 onClick={() => {
-                                                    this.deleteEntry(
-                                                        movieObj._id
-                                                    );
+                                                    deleteEntry(movieObj._id);
                                                 }}
                                             >
                                                 Delete

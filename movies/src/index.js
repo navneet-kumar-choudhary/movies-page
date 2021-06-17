@@ -8,10 +8,13 @@ import { BrowserRouter } from "react-router-dom";
 
 ReactDOM.render(
     <>
-        {/* <App /> */}
-        <BrowserRouter>
+    <BrowserRouter>
+    
+        <App />
+    </BrowserRouter>
+        {/* <BrowserRouter>
             <Routing></Routing>
-        </BrowserRouter>
+        </BrowserRouter> */}
     </>
 
     , document.getElementById("root")
